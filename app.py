@@ -17,46 +17,35 @@ def get_recommended_sensitivity(converted_current):
 @app.route("/webhook", methods=["POST"])
 def webhook():
     try:
-        body = request.get_json()
-        utterance = body.get("userRequest", {}).get("utterance", "")
-        value = float(utterance)
+        data = request.get_json()
+        user_input = data.get("userRequest", {}).get("utterance", "")
+        value = float(user_input)
         converted = round(value * 0.43, 2)
         recommended = get_recommended_sensitivity(converted)
 
-        result_text = f"변환 전류: {converted} mA / 추천 감도: {recommended}"
-
-        response_body = {
-            "version": "2.0",
-            "template": {
-                "outputs": [
-                    {
-                        "simpleText": {
-                            "text": result_text
-                        }
-                    }
-                ]
-            }
-        }
+        text = f"변환 전류: {converted} mA / 추천 감도: {recommended}"
 
     except Exception:
-        response_body = {
-            "version": "2.0",
-            "template": {
-                "outputs": [
-                    {
-                        "simpleText": {
-                            "text": "⚠️ 오류 발생: 숫자만 정확히 입력해주세요."
-                        }
+        text = "⚠️ 오류: 숫자만 입력해주세요."
+
+    response_body = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": text
                     }
-                ]
-            }
+                }
+            ]
         }
+    }
 
     return Response(
         json.dumps(response_body, ensure_ascii=False),
         status=200,
-        content_type='application/json'
+        content_type="application/json"
     )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run()
