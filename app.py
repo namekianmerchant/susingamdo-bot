@@ -38,31 +38,25 @@ def webhook():
             }
         }
 
-        return Response(
-            json.dumps(response_body, ensure_ascii=False),
-            status=200,
-            content_type='application/json'
-        )
-
-    except Exception as e:
-        error_response = {
+    except Exception:
+        response_body = {
             "version": "2.0",
             "template": {
                 "outputs": [
                     {
                         "simpleText": {
-                            "text": "❗ 오류 발생: 숫자만 입력해주세요."
+                            "text": "⚠️ 오류 발생: 숫자만 정확히 입력해주세요."
                         }
                     }
                 ]
             }
         }
 
-        return Response(
-            json.dumps(error_response, ensure_ascii=False),
-            status=200,
-            content_type='application/json'
-        )
+    return Response(
+        json.dumps(response_body, ensure_ascii=False),
+        status=200,
+        content_type='application/json'
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
