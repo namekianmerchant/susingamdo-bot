@@ -18,14 +18,14 @@ def get_recommended_sensitivity(converted_current):
 def webhook():
     try:
         body = request.get_json()
-        utterance = body["userRequest"]["utterance"]
+        utterance = body.get("userRequest", {}).get("utterance", "")
         value = float(utterance)
         converted = round(value * 0.43, 2)
         recommended = get_recommended_sensitivity(converted)
 
         result_text = f"변환 전류: {converted} mA / 추천 감도: {recommended}"
 
-        kakao_response = {
+        response_body = {
             "version": "2.0",
             "template": {
                 "outputs": [
@@ -39,19 +39,19 @@ def webhook():
         }
 
         return Response(
-            json.dumps(kakao_response),
+            json.dumps(response_body, ensure_ascii=False),
             status=200,
             content_type='application/json'
         )
 
-    except Exception:
+    except Exception as e:
         error_response = {
             "version": "2.0",
             "template": {
                 "outputs": [
                     {
                         "simpleText": {
-                            "text": "⚠️ 오류: 숫자만 입력해주세요."
+                            "text": "❗ 오류 발생: 숫자만 입력해주세요."
                         }
                     }
                 ]
@@ -59,7 +59,7 @@ def webhook():
         }
 
         return Response(
-            json.dumps(error_response),
+            json.dumps(error_response, ensure_ascii=False),
             status=200,
             content_type='application/json'
         )
